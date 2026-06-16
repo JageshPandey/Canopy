@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canopy</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="node_modules/canvas-confetti/dist/confetti.browser.js"></script>
+<style>
+  :root {
+    --accent: #0f766e;
+    --text-color: #0f172a;
+    --mist-gradient: linear-gradient(135deg, rgba(168, 237, 234, 0.7) 0%, rgba(254, 214, 227, 0.5) 100%);
+    --glass-bg: rgba(255, 255, 255, 0.35);
+    --glass-border: rgba(255, 255, 255, 0.6);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    --btn-glass: rgba(255, 255, 255, 0.4);
+    --hover: rgba(255, 255, 255, 0.6);
+    font-family: 'Inter', sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text-color: #f8fafc;
+      --mist-gradient: linear-gradient(135deg, #061f2d 0%, #04221c 100%);
+      --glass-bg: rgba(2, 6, 23, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.05);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+      --btn-glass: rgba(255, 255, 255, 0.05);
+      --hover: rgba(255, 255, 255, 0.05);
+      --accent: #14b8a6;
+    }
+  }
+
+  body {
+    margin: 0; padding: 0; height: 100vh;
+    background: transparent;
+    color: var(--text-color);
+    overflow: hidden; user-select: none;
+    -webkit-app-region: drag;
+  }
+
+  .window-container {
+    height: 100%; width: 100%;
+    background: var(--mist-gradient);
+    border-radius: 12px;
+    display: flex; flex-direction: column;
+    position: relative;
+    box-shadow: inset 0 0 0 1px var(--glass-border);
+    overflow: hidden;
+  }
+  
+  .glass-overlay {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(40px) saturate(180%);
+    z-index: 0;
+  }
+
+  .title-bar {
+    height: 40px; display: flex; justify-content: space-between; align-items: center;
+    padding: 0 16px; flex-shrink: 0; z-index: 10; position: relative;
+  }
+  
+  /* Windows style window controls */
+  .window-controls { -webkit-app-region: no-drag; display: flex; margin-left: auto; }
+  .control-btn {
+    width: 46px; height: 32px; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.1s; background: transparent; color: var(--text-color);
+    opacity: 0.8;
+  }
+  .control-btn:hover { background-color: var(--hover); opacity: 1; }
+  .control-btn.close:hover { background-color: #e81123; color: white; }
+
+  .content {
+    flex-grow: 1; position: relative; z-index: 10;
+    -webkit-app-region: no-drag;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 24px; text-align: center;
+  }
+
+  .state-view {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transform: translateY(10px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); padding: 24px;
+  }
+  .state-view.active {
+    opacity: 1; pointer-events: all; transform: translateY(0);
+  }
+
+  .logo-container {
+    width: 64px; height: 64px; margin-bottom: 16px;
+  }
+  .logo-container img {
+    width: 100%; height: 100%; object-fit: contain;
+    animation: breathe 4s ease-in-out infinite;
+  }
+  .fast-breathe img { animation: breathe 1.5s ease-in-out infinite; }
+
+  @keyframes breathe {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
+  h1 { font-size: 20px; margin: 0 0 6px 0; font-weight: 600; }
+  p { font-size: 14px; margin: 0 0 24px 0; opacity: 0.8; max-width: 80%; line-height: 1.4;}
+
+  /* Glass Buttons */
+  button.primary {
+    background-color: var(--accent); color: white; border: none;
+    padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(15, 118, 110, 0.3);
+    display: flex; align-items: center; gap: 8px;
+  }
+  button.primary:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(15, 118, 110, 0.4); }
+  button.primary:active { transform: translateY(1px); }
+  
+  .glass-box {
+    background: var(--btn-glass); border: 1px solid var(--glass-border);
+    padding: 24px 40px; border-radius: 16px; box-shadow: var(--glass-shadow);
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+
+  .drop-text { font-size: 12px; opacity: 0.6; }
+
+  button.ghost {
+    background: var(--btn-glass); color: var(--text-color); border: 1px solid var(--glass-border);
+    padding: 8px 20px; border-radius: 6px; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: background 0.1s; margin-top: 12px;
+  }
+  button.ghost:hover { background-color: var(--hover); }
+
+  .drop-zone {
+    position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px;
+    border: 2px dashed var(--accent); border-radius: 12px;
+    background: rgba(15, 118, 110, 0.1); z-index: 100;
+    display: none; align-items: center; justify-content: center;
+    font-weight: 600; color: var(--accent); pointer-events: none;
+    backdrop-filter: blur(4px);
+  }
+  body.drag-over .drop-zone { display: flex; }
+
+  .progress-container {
+    width: 80%; background-color: var(--btn-glass); height: 6px;
+    border-radius: 3px; overflow: hidden; margin-bottom: 12px; border: 1px solid var(--glass-border);
+  }
+  .progress-bar {
+    width: 0%; height: 100%; background-color: var(--accent);
+    transition: width 0.1s linear;
+  }
+  .ticker { font-size: 12px; opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
+
+  .stats { font-size: 13px; font-weight: 500; margin-bottom: 24px; opacity: 0.9;}
+
+  .error-card {
+    background: rgba(232, 17, 35, 0.1); border: 1px solid rgba(232, 17, 35, 0.2);
+    padding: 16px; border-radius: 8px; color: #e81123; font-size: 13px;
+    margin-bottom: 24px; max-width: 80%;
+  }
+  .recent-files {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: 24px; font-size: 12px; opacity: 0.8; flex-wrap: wrap; max-width: 90%;
+  }
+  .recent-chip {
+    background: var(--btn-glass); border: 1px solid var(--glass-border);
+    padding: 4px 10px; border-radius: 12px; display: flex; align-items: center; gap: 4px;
+    cursor: pointer; transition: 0.1s;
+  }
+  .recent-chip:hover { background: var(--hover); }
+
+    
+    /* Custom Scrollbars */
+    html { scroll-behavior: smooth; }
+    .main-content, .sidebar-content, .state-view { scroll-behavior: smooth; }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.02);
+      border-radius: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(20, 184, 166, 0.3);
+      border-radius: 6px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(20, 184, 166, 0.6);
+    }
+    body.dark-mode ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    body.dark-mode ::-webkit-scrollbar-thumb {
+      background: rgba(20, 184, 166, 0.4);
+    }
+    body.dark-mode ::-webkit-scrollbar-thumb:hover {
+      background: rgba(20, 184, 166, 0.8);
+    }
+  
+  </style>
+</head>
+<body>
+
+<div class="window-container">
+  <div class="glass-overlay"></div>
+  <div class="title-bar">
+    <div class="app-title-icon" style="display: flex; align-items: center;">
+      <img src="icon_small.png" alt="Icon" style="height: 18px; width: 18px; object-fit: contain;">
+    </div>
+    <div class="window-controls">
+      <button class="control-btn min" id="btn-min"><i data-lucide="minus" style="width:14px"></i></button>
+      <button class="control-btn max" id="btn-max"><i data-lucide="square" style="width:12px"></i></button>
+      <button class="control-btn close" id="btn-close"><i data-lucide="x" style="width:16px"></i></button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="drop-zone">Drop folder to scan</div>
+
+    <!-- STATE 1: IDLE -->
+    <div class="state-view active" id="state-idle">
+      <div class="logo-container" style="width: auto; height: 80px; margin-bottom: 20px;">
+        <img src="logo_full.png" alt="Canopy" style="height: 100%; width: auto; object-fit: contain;">
+      </div>
+      <p>Your files, beautifully mapped.</p>
+      <div class="glass-box">
+        <button class="primary" id="btn-choose"><i data-lucide="folder"></i> Choose Folder</button>
+        <span class="drop-text">or drag & drop a folder here</span>
+      </div>
+      <div class="recent-files" id="recent-files">
+        <!-- Recent chips injected here -->
+      </div>
+    </div>
+
+    <!-- STATE 2: SCANNING -->
+    <div class="state-view" id="state-scanning">
+      <div class="logo-container fast-breathe"><img src="icon.png" alt="Logo"></div>
+      <h1>Scanning your files...</h1>
+      <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+      <div class="ticker" id="ticker">Initializing...</div>
+    </div>
+
+    <!-- STATE 3: COMPLETE -->
+    <div class="state-view" id="state-complete">
+      <div class="logo-container" style="color: #10b981;"><i data-lucide="check-circle" style="width:100%;height:100%;stroke-width:1.5;"></i></div>
+      <h1>Scan Complete!</h1>
+      <div class="stats" id="stats-text"></div>
+      <p id="saved-path-text" style="font-size: 12px; margin-bottom: 24px; overflow: hidden; text-overflow: ellipsis; max-width:100%; white-space:nowrap;"></p>
+      <button class="primary" id="btn-open">Open in Browser</button>
+      <button class="ghost" id="btn-another">Scan Another</button>
+    </div>
+
+    <!-- STATE 4: ERROR -->
+    <div class="state-view" id="state-error">
+      <div class="logo-container" style="color: #e81123;"><i data-lucide="alert-triangle" style="width:100%;height:100%;stroke-width:1.5;"></i></div>
+      <h1>Something went wrong.</h1>
+      <div class="error-card" id="error-msg"></div>
+      <button class="primary" id="btn-retry">Try Again</button>
+    </div>
+  </div>
+</div>
+
+<script src="renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{
+  "name": "canopy",
+  "version": "1.0.1",
+  "description": "Canopy",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "npx electron-packager . \"Canopy\" --platform=win32 --arch=x64 --icon=icon.ico --out=dist --overwrite",
+    "dist": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.canopy.explorer",
+    "productName": "Canopy",
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "artifactName": "Canopy-Setup-v${version}.exe"
+    }
+  },
+  "keywords": [],
+  "author": "Jagesh Pandey",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^41.7.1",
+    "electron-builder": "^24.13.3",
+    "electron-winstaller": "^5.4.0"
+  },
+  "dependencies": {
+    "canvas-confetti": "^1.9.4",
+    "lucide": "^1.18.0"
+  }
+}
