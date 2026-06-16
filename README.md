@@ -16,5 +16,10 @@ Welcome to **Canopy**, a modern, sleek, and exceptionally fast directory mapping
 
 ---
 
+<img width="741" height="568" alt="Screenshot 2026-06-16 115726" src="https://github.com/user-attachments/assets/682b1404-44f1-47f4-b1e8-4977b069e557" />
+<img width="1887" height="906" alt="Screenshot 2026-06-16 122359" src="https://github.com/user-attachments/assets/35888c84-e6ff-47ff-b6d4-690bdbfe9e00" />
+<img width="1899" height="902" alt="Screenshot 2026-06-16 122209" src="https://github.com/user-attachments/assets/d8d902d1-ad83-44eb-8f89-8dd040a92142" />
+
+
 ### Built with ❤️ by Jagesh Pandey
 *Canopy was engineered and designed from the ground up by Jagesh Pandey. Every pixel, from the elegant dark-mist splash screen to the perfectly aligned umbrella logo, was crafted with love and a passion for beautiful software.*
