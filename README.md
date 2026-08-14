@@ -16,8 +16,10 @@ Welcome to **Canopy**, a modern, sleek, and exceptionally fast directory mapping
 
 ---
 
- [Download Canopy][(https://pages.github.com/](https://github.com/JageshPandey/Canopy/releases/download/v1.0.0/Canopy.V1.0.zip))
+ ## <a href="https://github.com/JageshPandey/Canopy/releases/download/v1.0.0/Canopy.V1.0.zip">Download - Canopy.V1.0.zip</a>
 
+
+---
 <img width="741" height="568" alt="Screenshot 2026-06-16 115726" src="https://github.com/user-attachments/assets/682b1404-44f1-47f4-b1e8-4977b069e557" />
 <img width="1887" height="906" alt="Screenshot 2026-06-16 122359" src="https://github.com/user-attachments/assets/35888c84-e6ff-47ff-b6d4-690bdbfe9e00" />
 <img width="1899" height="902" alt="Screenshot 2026-06-16 122209" src="https://github.com/user-attachments/assets/d8d902d1-ad83-44eb-8f89-8dd040a92142" />
